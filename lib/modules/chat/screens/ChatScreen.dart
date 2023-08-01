@@ -6,6 +6,8 @@ import 'package:signinfirebase/managers/LatestMessageManager.dart';
 import 'package:signinfirebase/modules/chat/controllers/ChatController.dart';
 import 'package:signinfirebase/modules/chat/models/LatestMessage.dart';
 
+import '../../../helpers/utils.dart';
+
 class ChatScreen extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -27,13 +29,14 @@ class ChatScreenState extends State<ChatScreen> {
     super.initState();
     _usernameController = TextEditingController();
     _firstMsgController = TextEditingController();
+    _chatController.initController();
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    _usernameController.text = "PjofWOzpl6U64FASbhPmm2Ssptd2";
-    _chatController.initController();
+    // _usernameController.text = "PjofWOzpl6U64FASbhPmm2Ssptd2";
+
     return  MaterialApp(
         home: Scaffold(
           body:SafeArea(child: Container(
@@ -73,7 +76,52 @@ class ChatScreenState extends State<ChatScreen> {
               child: Text("Send message"),
             ),
           ),),
-          SizedBox(height: 50,)
+          SizedBox(height: 50,),
+          Expanded(child: Obx(()=>ListView.builder(
+              shrinkWrap: true,
+              itemCount: _chatController.listLatestMessages.value.length,
+              itemBuilder: (BuildContext ctx, int idx) {
+                return Container(
+                  padding: EdgeInsets.only(bottom: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25)
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25),
+                          child: Image.network(_chatController.listLatestMessages.value[idx].userModel.avatar??"", fit: BoxFit.cover,),
+                        ),
+                      ),
+                      SizedBox(width: 8,),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("${_chatController.listLatestMessages.value[idx].userModel.name}",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400
+                          ),),
+                          SizedBox(height: 8,),
+                          Text("${_chatController.listLatestMessages.value[idx].latestMessage} .  ${readTimestamp((_chatController.listLatestMessages.value[idx].timestamp).toInt())}",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400
+                            ),),
+                        ],
+                      )
+                    ],
+                  ),
+                );
+              }
+          )))
         ],
       ),
     ))));
